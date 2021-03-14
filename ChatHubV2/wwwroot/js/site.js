@@ -49,3 +49,17 @@ function getToken() {
         xhr.send();
     });
 }
+
+connection.onclose(reconnect);
+
+function startConnection() {
+    console.log('connecting...');
+    connection.start()
+        .then(() => console.log('connected!'))
+        .catch(reconnect);
+}
+
+function reconnect() {
+    console.log('reconnecting...');
+    setTimeout(startConnection, 2000);
+}
