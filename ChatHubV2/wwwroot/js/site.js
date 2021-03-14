@@ -6,8 +6,12 @@ const messageForm = document.getElementById('message-form');
 const messageBox = document.getElementById('message-box');
 const messages = document.getElementById('messages');
 
+const options = {
+    accessTokenFactory: getToken
+};
+
 const connection = new signalR.HubConnectionBuilder()
-    .withUrl("/chat")
+    .withUrl("/chat", options)
     .configureLogging(signalR.LogLevel.Information)
     .build();
 
@@ -29,3 +33,19 @@ messageForm.addEventListener('submit', ev => {
     connection.invoke('SendMessage', message);
     messageBox.value = '';
 });
+
+function getToken() {
+    const xhr = new XMLHttpRequest();
+    return new Promise((resolve, reject) => {
+        xhr.onreadystatechange = function () {
+            if (this.readyState !== 4) return;
+            if (this.status == 200) {
+                resolve(this.responseText);
+            } else {
+                reject(this.statusText);
+            }
+        };
+        xhr.open("GET", "/api/token");
+        xhr.send();
+    });
+}
